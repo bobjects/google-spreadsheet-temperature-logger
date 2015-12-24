@@ -1,0 +1,4 @@
+push-to-github.sh
+.idea
+**/*.pyc
+**/google-oauth-credentials.json
