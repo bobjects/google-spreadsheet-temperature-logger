@@ -1,13 +1,13 @@
 import time
 from temperatureReadingFactory import TemperatureReadingFactory
 from configurationFile import ConfigurationFile
+from googleSpreadsheetWorksheet import GoogleSpreadsheetWorksheet
 
 
 def main():
     while True:
         temperature = TemperatureReadingFactory().create().acquire()
-        # TODO: need to implement the google spreadsheet part.  For now, just print the temperature.
-        print temperature
+        GoogleSpreadsheetWorksheet().logTemperatureReading(temperature)
         time.sleep(ConfigurationFile.instance().updatePeriodInSeconds)
 
 

@@ -21,6 +21,8 @@ class ConfigurationFile(object):
         self._useFahrenheit = None
         self._useOneWireDevice = None
         self._updatePeriodInSeconds = None
+        self._googleSpreadsheetTitle = None
+        self._googleOauthCredentialsJsonFileName = None
 
     @property
     def filePath(self):
@@ -76,4 +78,16 @@ class ConfigurationFile(object):
         if self._updatePeriodInSeconds is None:
             self._updatePeriodInSeconds = self.getIntFromParser(option="updatePeriodInSeconds", default=10)
         return self._updatePeriodInSeconds
+
+    @property
+    def googleSpreadsheetTitle(self):
+        if self._googleSpreadsheetTitle is None:
+            self._googleSpreadsheetTitle = self.getStringFromParser(option="googleSpreadsheetTitle", default="Temperature Log")
+        return self._googleSpreadsheetTitle
+
+    @property
+    def googleOauthCredentialsJsonFileName(self):
+        if self._googleOauthCredentialsJsonFileName is None:
+            self._googleOauthCredentialsJsonFileName = self.getStringFromParser(option="googleOauthCredentialsJsonFileName", default="google-oauth-credentials.json")
+        return self._googleOauthCredentialsJsonFileName
 
