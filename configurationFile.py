@@ -23,6 +23,9 @@ class ConfigurationFile(object):
         self._updatePeriodInSeconds = None
         self._googleSpreadsheetTitle = None
         self._googleOauthCredentialsJsonFileName = None
+        self._googleSpreadsheetDateColumnLetter = None
+        self._googleSpreadsheetTemperatureReadingColumnLetter = None
+        self._googleSpreadsheetMaximumReadings = None
 
     @property
     def filePath(self):
@@ -90,4 +93,22 @@ class ConfigurationFile(object):
         if self._googleOauthCredentialsJsonFileName is None:
             self._googleOauthCredentialsJsonFileName = self.getStringFromParser(option="googleOauthCredentialsJsonFileName", default="google-oauth-credentials.json")
         return self._googleOauthCredentialsJsonFileName
+
+    @property
+    def googleSpreadsheetDateColumnLetter(self):
+        if self._googleSpreadsheetDateColumnLetter is None:
+            self._googleSpreadsheetDateColumnLetter = self.getStringFromParser(option="googleSpreadsheetDateColumnLetter", default="A")
+        return self._googleSpreadsheetDateColumnLetter
+
+    @property
+    def googleSpreadsheetTemperatureReadingColumnLetter(self):
+        if self._googleSpreadsheetTemperatureReadingColumnLetter is None:
+            self._googleSpreadsheetTemperatureReadingColumnLetter = self.getStringFromParser(option="googleSpreadsheetTemperatureReadingColumnLetter", default="B")
+        return self._googleSpreadsheetTemperatureReadingColumnLetter
+
+    @property
+    def googleSpreadsheetMaximumReadings(self):
+        if self._googleSpreadsheetMaximumReadings is None:
+            self._googleSpreadsheetMaximumReadings = self.getIntFromParser(option="googleSpreadsheetMaximumReadings", default="100")
+        return self._googleSpreadsheetMaximumReadings
 

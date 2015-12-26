@@ -3,6 +3,7 @@ import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
 import datetime
 from configurationFile import ConfigurationFile
+import socket
 
 
 class GoogleSpreadsheetWorksheet(object):
@@ -14,17 +15,56 @@ class GoogleSpreadsheetWorksheet(object):
         if self.worksheet is not None:
             # TODO: Need to actually write out the reading.  For now, just print it.
             print temperatureNumber
+            self.worksheet.update_cells(self.allCellsWithNewTemperatureReading(temperatureNumber))
         else:
-            print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.spreadsheetTitle
+            print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.googleSpreadsheetTitle
         pass
 
+    def allCellsWithNewTemperatureReading(self, temperatureNumber):
+        return self.titleCells + self.dateColumnCells + self.temperatureReadingColumnCellsWithNewTemperatureReading(temperatureNumber)
+
     @property
-    def spreadsheetTitle(self):
+    def titleCells(self):
+        dateColumnTitleCell = self.worksheet.acell(self.googleSpreadsheetDateColumnLetter + "1")
+        readingColumnTitleCell = self.worksheet.acell(self.googleSpreadsheetTemperatureReadingColumnLetter + "1")
+        dateColumnTitleCell.value = "Date"
+        readingColumnTitleCell.value = self.hostName
+        return [ dateColumnTitleCell, readingColumnTitleCell ]
+
+    @property
+    def dateColumnCells(self):
+        cells = self.worksheet.range(self.worksheet.acell(self.googleSpreadsheetDateColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2)))
+        # TODO: fill in the dates.
+        return cells
+
+    def temperatureReadingColumnCellsWithNewTemperatureReading(self, temperatureNumber):
+        cells = self.worksheet.range(self.worksheet.acell(self.googleSpreadsheetTemperatureReadingColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2)))
+        # TODO: fill in the readings.
+        return cells
+
+    @property
+    def googleSpreadsheetTitle(self):
         return ConfigurationFile.instance().googleSpreadsheetTitle
+
+    @property
+    def hostName(self):
+        return socket.gethostname()
 
     @property
     def googleOauthCredentialsJsonFileName(self):
         return ConfigurationFile.instance().googleOauthCredentialsJsonFileName
+
+    @property
+    def googleSpreadsheetDateColumnLetter(self):
+        return ConfigurationFile.instance().googleSpreadsheetDateColumnLetter
+
+    @property
+    def googleSpreadsheetTemperatureReadingColumnLetter(self):
+        return ConfigurationFile.instance().googleSpreadsheetTemperatureReadingColumnLetter
+
+    @property
+    def googleSpreadsheetMaximumReadings(self):
+        return ConfigurationFile.instance().googleSpreadsheetMaximumReadings
 
     @property
     def worksheet(self):
@@ -44,7 +84,7 @@ class GoogleSpreadsheetWorksheet(object):
                 credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'].encode(), scope)
                 # TODO:  commented out for now, until we have real JSON-resident credentials.
                 # client = gspread.authorize(credentials)
-                # self._spreadsheet = client.open(self.spreadsheetTitle)
+                # self._spreadsheet = client.open(self.googleSpreadsheetTitle)
             except:
                 return None
         return self._spreadsheet
