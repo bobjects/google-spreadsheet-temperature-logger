@@ -14,10 +14,15 @@ class GoogleSpreadsheetWorksheet(object):
     def logTemperatureReading(self, temperatureNumber):
         if self.worksheet is not None:
             print temperatureNumber
+            self.resizeWorksheetIfNeeded()
             self.worksheet.update_cells(self.allCellsWithNewTemperatureReading(temperatureNumber))
         else:
             print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.googleSpreadsheetTitle
         pass
+
+    def resizeWorksheetIfNeeded(self):
+        if self.worksheet.row_count < (self.googleSpreadsheetMaximumReadings + 2):
+            self.worksheet.resize(self.googleSpreadsheetMaximumReadings + 2)
 
     def allCellsWithNewTemperatureReading(self, temperatureNumber):
         return self.titleCells + self.dateColumnCells + self.temperatureReadingColumnCellsWithNewTemperatureReading(temperatureNumber)
@@ -32,13 +37,21 @@ class GoogleSpreadsheetWorksheet(object):
 
     @property
     def dateColumnCells(self):
-        cells = self.worksheet.range(self.googleSpreadsheetDateColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
-        # TODO: fill in the dates.
+        # TODO:  This technique of retrieving all cells and moving the values around is way too slow and bandwidth intensive for a realistic
+        # number of readings.  We need to do something else.  But what?  insert_row() doesn't sound good, because there may be other hosts that
+        # are simultaneously, but asynchronously to us, updating the same worksheet.  There doesn't seem to be an insert_cell().
+        cells = self.worksheet.range(self.googleSpreadsheetDateColumnLetter + "2:" + self.googleSpreadsheetDateColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
+        for i in reversed(range(1, self.googleSpreadsheetMaximumReadings)):
+            cells[i].value = cells[i - 1].value
+        cells[0].value = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return cells
 
     def temperatureReadingColumnCellsWithNewTemperatureReading(self, temperatureNumber):
+        # TODO:  see TODO note for dateColumnCells().
         cells = self.worksheet.range(self.googleSpreadsheetTemperatureReadingColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
-        # TODO: fill in the readings.
+        for i in reversed(range(1, self.googleSpreadsheetMaximumReadings)):
+            cells[i].value = cells[i - 1].value
+        cells[0].value = temperatureNumber
         return cells
 
     @property
