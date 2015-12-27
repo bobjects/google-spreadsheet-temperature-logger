@@ -2,3 +2,4 @@ push-to-github.sh
 .idea
 **/*.pyc
 **/google-oauth-credentials.json
+temperature-logger-5e3c7c5aaa04.json
