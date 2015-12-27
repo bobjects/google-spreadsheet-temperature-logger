@@ -13,7 +13,6 @@ class GoogleSpreadsheetWorksheet(object):
 
     def logTemperatureReading(self, temperatureNumber):
         if self.worksheet is not None:
-            # TODO: Need to actually write out the reading.  For now, just print it.
             print temperatureNumber
             self.worksheet.update_cells(self.allCellsWithNewTemperatureReading(temperatureNumber))
         else:
@@ -33,12 +32,12 @@ class GoogleSpreadsheetWorksheet(object):
 
     @property
     def dateColumnCells(self):
-        cells = self.worksheet.range(self.worksheet.acell(self.googleSpreadsheetDateColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2)))
+        cells = self.worksheet.range(self.googleSpreadsheetDateColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
         # TODO: fill in the dates.
         return cells
 
     def temperatureReadingColumnCellsWithNewTemperatureReading(self, temperatureNumber):
-        cells = self.worksheet.range(self.worksheet.acell(self.googleSpreadsheetTemperatureReadingColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2)))
+        cells = self.worksheet.range(self.googleSpreadsheetTemperatureReadingColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
         # TODO: fill in the readings.
         return cells
 
@@ -79,12 +78,13 @@ class GoogleSpreadsheetWorksheet(object):
     def spreadsheet(self):
         if self._spreadsheet is None:
             try:
-                json_key = json.load(open(self.googleOauthCredentialsJsonFileName))
+                json_key = None
+                with open(self.googleOauthCredentialsJsonFileName, "r") as jsonFile:
+                    json_key = json.load(jsonFile)
                 scope = ['https://spreadsheets.google.com/feeds']
                 credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'].encode(), scope)
-                # TODO:  commented out for now, until we have real JSON-resident credentials.
-                # client = gspread.authorize(credentials)
-                # self._spreadsheet = client.open(self.googleSpreadsheetTitle)
+                client = gspread.authorize(credentials)
+                self._spreadsheet = client.open(self.googleSpreadsheetTitle)
             except:
                 return None
         return self._spreadsheet
