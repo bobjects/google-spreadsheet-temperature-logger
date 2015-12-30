@@ -24,8 +24,10 @@ class TemperatureReadingFactory(object):
     def isRaspberryPi(self):
         try:
             with open("/proc/cpuinfo", "r") as procFile:
+                fileContents = procFile.read()
                 regex = re.compile(".*BCM2708.*", re.DOTALL)
-                return regex.match(procFile.read()) is not None
+                regex2 = re.compile(".*BCM2709.*", re.DOTALL)
+                return (regex.match(fileContents) is not None) or (regex2.match(fileContents) is not None)
         except:
             return False
 

@@ -14,8 +14,14 @@ class GoogleSpreadsheetWorksheet(object):
     def logTemperatureReading(self, temperatureNumber):
         if self.worksheet is not None:
             print temperatureNumber
-            self.resizeWorksheetIfNeeded()
-            self.worksheet.update_cells(self.allCellsWithNewTemperatureReading(temperatureNumber))
+            try:
+                self.resizeWorksheetIfNeeded()
+            except:
+                print "An error occurred while resizing the worksheet.  The worksheet was not updated with this temperature reading."
+            try:
+                self.worksheet.update_cells(self.allCellsWithNewTemperatureReading(temperatureNumber))
+            except:
+                print "An error occurred while updating the worksheet cells.  The worksheet was not updated with this temperature reading."
         else:
             print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.googleSpreadsheetTitle
         pass
