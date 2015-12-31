@@ -1,4 +1,5 @@
 import re
+import platform
 from configurationFile import ConfigurationFile
 from oneWireDeviceTemperatureReading import OneWireDeviceTemperatureReading
 from raspberryPiCPUTemperatureReading import RaspberryPiCPUTemperatureReading
@@ -33,13 +34,11 @@ class TemperatureReadingFactory(object):
 
     @property
     def isOSX(self):
-        # TODO
-        return False
+        return platform.system() == "Darwin"
 
     @property
     def isLinuxBox(self):
-        # TODO
-        return False
+        return (not self.isRaspberryPi) and platform.system() == "Linux"
 
     @property
     def useOneWireDevice(self):

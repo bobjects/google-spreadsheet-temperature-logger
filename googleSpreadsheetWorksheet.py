@@ -19,12 +19,13 @@ class GoogleSpreadsheetWorksheet(object):
             except:
                 print "An error occurred while resizing the worksheet.  The worksheet was not updated with this temperature reading."
             try:
-                self.worksheet.update_cells(self.allCellsWithNewTemperatureReading(temperatureNumber))
+                cells = self.allCellsWithNewTemperatureReading(temperatureNumber)
+                # TODO: update_cells() takes a long time.  Is there a faster way?  I think this is supposed to BE the faster way.
+                self.worksheet.update_cells(cells)
             except:
                 print "An error occurred while updating the worksheet cells.  The worksheet was not updated with this temperature reading."
         else:
             print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.googleSpreadsheetTitle
-        pass
 
     def resizeWorksheetIfNeeded(self):
         if self.worksheet.row_count < (self.googleSpreadsheetMaximumReadings + 2):
@@ -43,9 +44,6 @@ class GoogleSpreadsheetWorksheet(object):
 
     @property
     def dateColumnCells(self):
-        # TODO:  This technique of retrieving all cells and moving the values around is way too slow and bandwidth intensive for a realistic
-        # number of readings.  We need to do something else.  But what?  insert_row() doesn't sound good, because there may be other hosts that
-        # are simultaneously, but asynchronously to us, updating the same worksheet.  There doesn't seem to be an insert_cell().
         cells = self.worksheet.range(self.googleSpreadsheetDateColumnLetter + "2:" + self.googleSpreadsheetDateColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
         for i in reversed(range(1, self.googleSpreadsheetMaximumReadings)):
             cells[i].value = cells[i - 1].value
@@ -53,7 +51,6 @@ class GoogleSpreadsheetWorksheet(object):
         return cells
 
     def temperatureReadingColumnCellsWithNewTemperatureReading(self, temperatureNumber):
-        # TODO:  see TODO note for dateColumnCells().
         cells = self.worksheet.range(self.googleSpreadsheetTemperatureReadingColumnLetter + "2:" + self.googleSpreadsheetTemperatureReadingColumnLetter + str(self.googleSpreadsheetMaximumReadings + 2))
         for i in reversed(range(1, self.googleSpreadsheetMaximumReadings)):
             cells[i].value = cells[i - 1].value
