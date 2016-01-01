@@ -26,6 +26,7 @@ class ConfigurationFile(object):
         self._googleSpreadsheetDateColumnLetter = None
         self._googleSpreadsheetTemperatureReadingColumnLetter = None
         self._googleSpreadsheetMaximumReadings = None
+        self._doNotLogOnlyDisplay = None
 
     @property
     def filePath(self):
@@ -112,3 +113,8 @@ class ConfigurationFile(object):
             self._googleSpreadsheetMaximumReadings = self.getIntFromParser(option="googleSpreadsheetMaximumReadings", default="100")
         return self._googleSpreadsheetMaximumReadings
 
+    @property
+    def doNotLogOnlyDisplay(self):
+        if self._doNotLogOnlyDisplay is None:
+            self._doNotLogOnlyDisplay = self.getBooleanFromParser(option="doNotLogOnlyDisplay", default=False)
+        return self._doNotLogOnlyDisplay

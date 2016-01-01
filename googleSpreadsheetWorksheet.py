@@ -12,20 +12,23 @@ class GoogleSpreadsheetWorksheet(object):
         self._worksheet = None
 
     def logTemperatureReading(self, temperatureNumber):
-        if self.worksheet is not None:
+        if self.doNotLogOnlyDisplay:
             print temperatureNumber
-            try:
-                self.resizeWorksheetIfNeeded()
-            except:
-                print "An error occurred while resizing the worksheet.  The worksheet was not updated with this temperature reading."
-            try:
-                cells = self.allCellsWithNewTemperatureReading(temperatureNumber)
-                # TODO: update_cells() takes a long time.  Is there a faster way?  I think this is supposed to BE the faster way.
-                self.worksheet.update_cells(cells)
-            except:
-                print "An error occurred while updating the worksheet cells.  The worksheet was not updated with this temperature reading."
         else:
-            print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.googleSpreadsheetTitle
+            if self.worksheet is not None:
+                print temperatureNumber
+                try:
+                    self.resizeWorksheetIfNeeded()
+                except:
+                    print "An error occurred while resizing the worksheet.  The worksheet was not updated with this temperature reading."
+                try:
+                    cells = self.allCellsWithNewTemperatureReading(temperatureNumber)
+                    # TODO: update_cells() takes a long time.  Is there a faster way?  I think this is supposed to BE the faster way.
+                    self.worksheet.update_cells(cells)
+                except:
+                    print "An error occurred while updating the worksheet cells.  The worksheet was not updated with this temperature reading."
+            else:
+                print str(temperatureNumber) + " - Could not OAuth2 authenticate with Google, or could not find spreadsheet with title " + self.googleSpreadsheetTitle
 
     def resizeWorksheetIfNeeded(self):
         if self.worksheet.row_count < (self.googleSpreadsheetMaximumReadings + 2):
@@ -80,6 +83,10 @@ class GoogleSpreadsheetWorksheet(object):
     @property
     def googleSpreadsheetMaximumReadings(self):
         return ConfigurationFile.instance().googleSpreadsheetMaximumReadings
+
+    @property
+    def doNotLogOnlyDisplay(self):
+        return ConfigurationFile.instance().doNotLogOnlyDisplay
 
     @property
     def worksheet(self):
